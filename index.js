@@ -16,9 +16,17 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
-    const message = req.body.message;
-    io.emit('chatMessage', { username: req.body.username, message });
-    res.status(200).json({ success: true });
+    const date = new Date();
+    const { message, username } = req.body;
+    if (!message && !username) {
+        return res.status(400).json({ success: false, message: 'Missing message or username parameter' });
+    }
+    io.emit('chatMessage', { username: filterMessage(username), message: filterMessage(message) });
+    res.status(200).json({ 
+        success: true,
+        execution_time: date - Date.now(),
+        message: 'Message sent successfully' 
+    }); // this makes it look better! mawaaaha
 });
 
 function filterMessage(message) {
