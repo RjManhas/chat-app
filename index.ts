@@ -32,14 +32,14 @@ app.post('/api/messages', (req: Request<{}, {}, MessageRequestBody>, res: Respon
 
     io.emit('chatMessage', { username: filterMessage(username), message: filterMessage(message) });
 
-    const executionTime = Date.now() - startTime;
-    const censoredMessage = filterMessage(message);
-    const date = formatDate(new Date().toISOString());
-    const endpoint = req.headers['x-forwarded-for'] as string || '127.0.0.1';
+    const executionTime: number = Date.now() - startTime;
+    const censoredMessage: string = filterMessage(message);
+    const date: string = formatDate(new Date().toISOString());
+    const endpoint: string = req.headers['x-forwarded-for'] as string || '127.0.0.1';
     logMessage(censoredMessage, username, date, endpoint);
     res.status(200).json({ 
         success: true,
-        execution_time: executionTime,
+        execution_time: `${executionTime}ms`,
         message: 'Message sent successfully' 
     });
 });
@@ -56,7 +56,7 @@ function isValidMessage(message: string): boolean {
 }
 
 function filterMessage(message: string): string {
-    const badWords = [
+    const badWords: string[] = [
         'nigger',
         'faggot'
     ];
@@ -79,13 +79,12 @@ app.get('/api/history', (req: Request, res: Response) => {
     const { room } = req.query;
 
     if (room && typeof room === 'string') {
-        const history = loadRoomHistory(room);
+        const history: HistoryMessage[] = loadRoomHistory(room);
         return res.send({ history: history });
-    } else {
-        res.send({
-            history: JSON.parse(data)
-        });
-    }
+    } // i did it the wrong way last time Woops
+    res.send({
+        history: JSON.parse(data)
+    });
 });
 
 function logMessage(message: string, username: string, date: string, endpoint: string, room?: string) {
@@ -109,13 +108,15 @@ io.on('connection', (socket: any) => {
     });
 
     socket.on('sendMessage', (msg: string) => {
-        const censoredMessage = filterMessage(msg);
-        const date = formatDate(new Date().toISOString());
-        const endpoint = socket.handshake.address || 'Unknown';
+        const censoredMessage: string = filterMessage(msg);
+        const date: string = formatDate(new Date().toISOString());
+        const endpoint: string = socket.handshake.address || 'Unknown';
         logMessage(censoredMessage, username, date, endpoint);
         io.emit('chatMessage', { username, message: censoredMessage });
     });
 });
+
+
 
 server.listen(6969, () => {
     console.log('Server running on port http://localhost:6969');

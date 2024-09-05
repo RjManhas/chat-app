@@ -33,7 +33,7 @@ app.post('/api/messages', (req, res) => {
     logMessage(censoredMessage, username, date, endpoint);
     res.status(200).json({
         success: true,
-        execution_time: executionTime,
+        execution_time: `${executionTime}ms`,
         message: 'Message sent successfully'
     });
 });
@@ -67,12 +67,10 @@ app.get('/api/history', (req, res) => {
     if (room && typeof room === 'string') {
         const history = loadRoomHistory(room);
         return res.send({ history: history });
-    }
-    else {
-        res.send({
-            history: JSON.parse(data)
-        });
-    }
+    } // i did it the wrong way last time Woops
+    res.send({
+        history: JSON.parse(data)
+    });
 });
 function logMessage(message, username, date, endpoint, room) {
     const data = fs_1.default.readFileSync('history.json', 'utf8');
