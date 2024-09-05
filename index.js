@@ -3,6 +3,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const app = express();
 const server = http.createServer(app);
+const fs = require('fs');
 const io = socketIO(server);
 
 const Fuse = require('fuse.js');
@@ -16,18 +17,33 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
-    const date = new Date();
+    const startTime = Date.now();
     const { message, username } = req.body;
-    if (!message && !username) {
+
+    if (!message || !username) {
         return res.status(400).json({ success: false, message: 'Missing message or username parameter' });
     }
+
     io.emit('chatMessage', { username: filterMessage(username), message: filterMessage(message) });
+
+    const executionTime = Date.now() - startTime;
+    const censoredMessage = filterMessage(message);
+    const date = formatDate(new Date().toISOString());
+    const endpoint = req['x-forwarded-for'] || '127.0.0.1';
+    logMessage(censoredMessage, username, date, endpoint);
     res.status(200).json({ 
         success: true,
-        execution_time: date - Date.now(),
+        execution_time: executionTime,
         message: 'Message sent successfully' 
-    }); // this makes it look better! mawaaaha
+    });
 });
+
+
+function loadRoomHistory(room) {
+    const data = fs.readFileSync('history.json', 'utf8');
+    const history = JSON.parse(data);
+    return history.filter((message) => message.room === room);
+}
 
 function filterMessage(message) {
     const badWords = [
@@ -60,16 +76,45 @@ function filterMessage(message) {
     return censoredMessage;
 }
 
+app.get('/api/history/:room', (req, res) => {
+    const data = fs.readFileSync('history.json', 'utf8');
+    const { room } = req.params;
+
+    if (room) {
+        const history = loadRoomHistory(room);
+        return res.send({ history: history });
+    } else {
+        res.send({
+            history: JSON.parse(data)
+        });
+    }
+})
+
+function logMessage(message, username, date, endpoint, room) {
+    const data = fs.readFileSync('history.json', 'utf8');
+    const history = JSON.parse(data);
+    history.push({ message, username, date, endpoint, room });
+    fs.writeFileSync('history.json', JSON.stringify(history, null, 2), 'utf8');
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+}
+
 io.on('connection', (socket) => {
     let username = 'Anonymous';
 
     socket.on('setUsername', (uname) => {
         let censoredName = filterMessage(uname);
-        username = censoredName; // mwaahahah no bad names now!
+        username = censoredName;
     });
 
     socket.on('sendMessage', (msg) => {
         const censoredMessage = filterMessage(msg);
+        const date = formatDate(new Date().toISOString());
+        const endpoint = socket.handshake.address;
+        logMessage(censoredMessage, username, date, endpoint);
         io.emit('chatMessage', { username, message: censoredMessage });
     });
 });
