@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import http from 'http';
 import { Server as socketIO } from 'socket.io';
 import fs from 'fs';
+import { HistoryMessage, MessageRequestBody } from './interfaces';
 
 const app = express();
 const server = http.createServer(app);
@@ -11,18 +12,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
 
-interface MessageRequestBody {
-    message: string;
-    username: string;
-}
 
-interface HistoryMessage {
-    message: string;
-    username: string;
-    date: string;
-    endpoint: string;
-    room?: string;
-}
 
 app.get('/', (req: Request, res: Response) => {
     res.render('index');
