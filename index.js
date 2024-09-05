@@ -85,7 +85,7 @@ function filterMessage(message) {
     return censoredMessage;
 }
 
-app.get('/api/history/:room', (req, res) => {
+app.get('/api/history', (req, res) => {
     const data = fs.readFileSync('history.json', 'utf8');
     const { room } = req.params;
 
