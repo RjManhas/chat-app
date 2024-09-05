@@ -56,8 +56,8 @@ io.on('connection', (socket) => {
     let username = 'Anonymous';
 
     socket.on('setUsername', (uname) => {
-        let censoredMessage = filterMessage(uname);
-        username = censoredMessage; // mwaahahah no bad names now!
+        let censoredName = filterMessage(uname);
+        username = censoredName; // mwaahahah no bad names now!
     });
 
     socket.on('sendMessage', (msg) => {
