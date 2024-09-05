@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
-    const { message, username }= req.body.message;
+    const { message, username }= req.body;
     io.emit('chatMessage', { username: username, message: message });
     res.status(200).json({ success: true });
 });
@@ -38,6 +38,6 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3000, () => {
-    console.log('Server running on port http://localhost:3000');
+server.listen(6969, () => {
+    console.log('Server running on port http://localhost:6969');
 });
