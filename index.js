@@ -24,6 +24,10 @@ app.post('/api/messages', (req, res) => {
         return res.status(400).json({ success: false, message: 'Missing message or username parameter' });
     }
 
+    if (!isValidMessage(message)) {
+        return res.status(400).json({ success: false, message: 'Message must not be empty and should be under 200 characters!' });
+    }
+
     io.emit('chatMessage', { username: filterMessage(username), message: filterMessage(message) });
 
     const executionTime = Date.now() - startTime;
@@ -43,6 +47,11 @@ function loadRoomHistory(room) {
     const data = fs.readFileSync('history.json', 'utf8');
     const history = JSON.parse(data);
     return history.filter((message) => message.room === room);
+}
+
+function isValidMessage(message) {
+    const trimmedMessage = message.trim();
+    return trimmedMessage.length > 0 && trimmedMessage.length <= 200;
 }
 
 function filterMessage(message) {
@@ -90,6 +99,20 @@ app.get('/api/history/:room', (req, res) => {
     }
 })
 
+// Development Testing
+// app.get('/api/endpoints', (req, res) => {
+//     const data = fs.readFileSync('history.json', 'utf8');
+//     const history = JSON.parse(data);
+    
+//     const endpoints = new Set();
+
+//     history.forEach((message) => {
+//         endpoints.add(message.endpoint);
+//     });
+
+//     res.send({ endpoints: Array.from(endpoints) });
+// })
+
 function logMessage(message, username, date, endpoint, room) {
     const data = fs.readFileSync('history.json', 'utf8');
     const history = JSON.parse(data);
@@ -118,6 +141,8 @@ io.on('connection', (socket) => {
         io.emit('chatMessage', { username, message: censoredMessage });
     });
 });
+
+
 
 server.listen(6969, () => {
     console.log('Server running on port http://localhost:6969');

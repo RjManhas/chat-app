@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
+
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const messages = document.getElementById('messages');

@@ -24,47 +24,7 @@ body {
   flex-direction: column;
 }
 
-#room-container {
-  margin-bottom: 20px;
-}
 
-#room-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-#room-form label {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #555;
-}
-
-#room-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-}
-
-#room-form button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#room-form button:hover {
-  background-color: #0056b3;
-}
 
 #messages {
   list-style-type: none;
