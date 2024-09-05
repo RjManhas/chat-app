@@ -6,10 +6,18 @@
     <title>Chat App</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat.js"></script>
+    <script src="/js/chat.js" defer></script>
 </head>
 <body>
-    <div id="chat-container">
+    <div id="username-container">
+        <form id="username-form">
+            <label for="username-input">Enter your username:</label>
+            <input id="username-input" type="text" autocomplete="off" placeholder="Username" required>
+            <button type="submit">Join Chat</button>
+        </form>
+    </div>
+
+    <div id="chat-container" style="display: none;">
         <ul id="messages"></ul>
         <div id="input-container">
             <input id="message-input" type="text" autocomplete="off" placeholder="Type a message">

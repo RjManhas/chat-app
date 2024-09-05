@@ -2,8 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const socket = io();
     let username;
 
-    socket.on('setUsername', (uname) => {
-        username = uname || 'Anonymous';
+    const usernameForm = document.getElementById('username-form');
+    const usernameInput = document.getElementById('username-input');
+    const chatContainer = document.getElementById('chat-container');
+    const usernameContainer = document.getElementById('username-container');
+
+    usernameForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        username = usernameInput.value.trim();
+
+        if (username !== '' || username !== null) {
+            socket.emit('setUsername', username);
+            usernameContainer.style.display = 'none';
+            chatContainer.style.display = 'block';
+        } else {
+            alert('Please enter a valid username!');
+        }
     });
 
     const messageInput = document.getElementById('message-input');
@@ -24,11 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         socket.emit('sendMessage', message);
-        messageInput.value = ''; 
+        messageInput.value = '';
     });
 
     socket.on('chatMessage', (data) => {
-        if (!data || !data.message) return; 
+        if (!data || !data.message) return;
 
         const newMessage = document.createElement('li');
         newMessage.textContent = `${data.username}: ${data.message}`;
