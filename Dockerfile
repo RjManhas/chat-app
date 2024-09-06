@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 6969
-CMD ["node", "index.js"]
+CMD ["npm", "run", "dev"]

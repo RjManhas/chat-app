@@ -20,8 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
-
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const messages = document.getElementById('messages');
@@ -31,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return trimmedMessage.length > 0 && trimmedMessage.length <= 200;
     }
 
-    sendBtn.addEventListener('click', () => {
+    function sendMessage() {
         const message = messageInput.value;
 
         if (!isValidMessage(message)) {
@@ -41,6 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.emit('sendMessage', message);
         messageInput.value = '';
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    messageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            sendMessage();
+        }
     });
 
     socket.on('chatMessage', (data) => {
@@ -49,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newMessage = document.createElement('li');
         newMessage.textContent = `${data.username}: ${data.message}`;
 
-        messages.prepend(newMessage);
+        messages.append(newMessage);
+
+        messages.scrollTop = messages.scrollHeight;
     });
 });
